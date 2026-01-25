@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import authConfig from '../config/env.config.js';
 
-console.log(authConfig.mongodb_uri)
 const connectDB = async () => {
   try {
     await mongoose.connect(authConfig.mongodb_uri);
