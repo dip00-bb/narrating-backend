@@ -24,11 +24,17 @@ export const handleRegisterUser = asynceHandler(async (req, res) => {
         throw new ApiError(409, "This already used. Please Try with a new account Or Login")
     }
 
-    const user = await User.create({
+    const createdUser = await User.create({
         username,
         email,
         password
     })
+
+    if (!createdUser) {
+        throw new ApiError(500, "Something Went Wrong While create new user. Please try again")
+    }
+
+    const user = await User.findById(createdUser._id).select("-password -refreshToken")
 
     return res.status(200).json(
         new ApiResponse(
