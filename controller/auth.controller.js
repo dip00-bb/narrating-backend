@@ -1,6 +1,6 @@
 import User from "../model/User.js";
 
-const handleRegisterUser = async () => {
+export const handleRegisterUser = async (req,res) => {
     // get user details
 
     // username
@@ -9,5 +9,8 @@ const handleRegisterUser = async () => {
     // check user already in database or not
     // if yes return already exit 
     // else create new user
-    
+
+    const { username, email, password } = req.body
+    console.log(username, email, password)
+    res.status(200).json("4444")
 }
