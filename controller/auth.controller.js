@@ -5,12 +5,30 @@ import { asynceHandler } from "../ulits/asyncHandler.js";
 
 
 
-const generateUserInfoObject=(username,email,id,__v)=>{
+const generateUserInfoObject = (username, email, id, __v) => {
     return {
-        username:username,
-        email:email,
-        _id:id,
-        __v:__v
+        username: username,
+        email: email,
+        _id: id,
+        __v: __v
+    }
+}
+
+
+const generateToken = (user) => {
+    const accessToken = user.generateAccessToken()
+    const refreshToken = user.generateRefreshToken()
+
+    return { accessToken, refreshToken }
+}
+
+const generateTokenOption = (tokenType) => {
+    const accessTokenExpireAge = 4 * 60 * 1000;
+    const refreshTokenExpireAge = 30 * 24 * 60 * 60 * 1000
+    return {
+        secure: true,
+        httpOnly: true,
+        maxAge: tokenType === "access" ? accessTokenExpireAge : refreshTokenExpireAge
     }
 }
 
@@ -45,7 +63,7 @@ export const handleRegisterUser = asynceHandler(async (req, res) => {
         throw new ApiError(500, "Something Went Wrong While create new user. Please try again")
     }
 
-    const user = generateUserInfoObject(createdUser.username,createdUser.email,createdUser._id,createdUser.__v)
+    const user = generateUserInfoObject(createdUser.username, createdUser.email, createdUser._id, createdUser.__v)
 
     return res.status(200).json(
         new ApiResponse(
@@ -78,20 +96,23 @@ export const handleUserLogin = asynceHandler(async (req, res) => {
     const isCorrectPassword = await user.isPasswordCorrect(password);
 
 
-    const loogedInUser=generateUserInfoObject(user.username,user.email,user._id,user.__v)
+    const loogedInUser = generateUserInfoObject(user.username, user.email, user._id, user.__v)
 
     if (!isCorrectPassword) {
         throw new ApiError(401, "Unauthorize Access")
     }
 
-    
+    const { accessToken, refreshToken } = generateToken(user);
+
 
     res
         .status(200)
+        .cookie("accessToken", accessToken,generateTokenOption("access"))
+        .cookie("refreshToken", refreshToken,generateTokenOption("refresh"))
         .json(
             new ApiResponse(
                 200,
-                {user:loogedInUser},
+                { user: loogedInUser },
                 "Log in successfull"
             )
         )
