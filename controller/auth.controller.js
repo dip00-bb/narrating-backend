@@ -15,17 +15,17 @@ const generateUserInfoObject = (username, email, id, __v) => {
 }
 
 
-const generateToken =  async (user) => {
+const generateToken = async (user) => {
     const accessToken = user.generateAccessToken()
     const refreshToken = user.generateRefreshToken()
 
-    user.refreshToken=refreshToken
+    user.refreshToken = refreshToken
     await user.save()
     return { accessToken, refreshToken }
 }
 
 const generateTokenOption = (tokenType) => {
-    const accessTokenExpireAge = 4 * 60 * 1000;
+    const accessTokenExpireAge = 15 * 60 * 1000;
     const refreshTokenExpireAge = 30 * 24 * 60 * 60 * 1000
     return {
         secure: true,
@@ -109,8 +109,8 @@ export const handleUserLogin = asynceHandler(async (req, res) => {
 
     res
         .status(200)
-        .cookie("accessToken", accessToken,generateTokenOption("access"))
-        .cookie("refreshToken", refreshToken,generateTokenOption("refresh"))
+        .cookie("accessToken", accessToken, generateTokenOption("access"))
+        .cookie("refreshToken", refreshToken, generateTokenOption("refresh"))
         .json(
             new ApiResponse(
                 200,
@@ -119,4 +119,10 @@ export const handleUserLogin = asynceHandler(async (req, res) => {
             )
         )
 
+})
+
+
+export const handleUserLogout = asynceHandler(async (req, res) => {
+    
+    res.status(200).json({ name: "dip" })
 })
