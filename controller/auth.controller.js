@@ -5,7 +5,14 @@ import { asynceHandler } from "../ulits/asyncHandler.js";
 
 
 
-
+const generateUserInfoObject=(username,email,id,__v)=>{
+    return {
+        username:username,
+        email:email,
+        _id:id,
+        __v:__v
+    }
+}
 
 export const handleRegisterUser = asynceHandler(async (req, res) => {
 
@@ -38,7 +45,7 @@ export const handleRegisterUser = asynceHandler(async (req, res) => {
         throw new ApiError(500, "Something Went Wrong While create new user. Please try again")
     }
 
-    const user = await User.findById(createdUser._id).select("-password -refreshToken")
+    const user = generateUserInfoObject(createdUser.username,createdUser.email,createdUser._id,createdUser.__v)
 
     return res.status(200).json(
         new ApiResponse(
@@ -71,12 +78,7 @@ export const handleUserLogin = asynceHandler(async (req, res) => {
     const isCorrectPassword = await user.isPasswordCorrect(password);
 
 
-    const loogedInUser={
-        _id:user._id,
-        username:user.username,
-        email:user.email,
-        __V:user.__v
-    }
+    const loogedInUser=generateUserInfoObject(user.username,user.email,user._id,user.__v)
 
     if (!isCorrectPassword) {
         throw new ApiError(401, "Unauthorize Access")
