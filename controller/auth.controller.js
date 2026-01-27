@@ -15,10 +15,12 @@ const generateUserInfoObject = (username, email, id, __v) => {
 }
 
 
-const generateToken = (user) => {
+const generateToken =  async (user) => {
     const accessToken = user.generateAccessToken()
     const refreshToken = user.generateRefreshToken()
 
+    user.refreshToken=refreshToken
+    await user.save()
     return { accessToken, refreshToken }
 }
 
@@ -102,7 +104,7 @@ export const handleUserLogin = asynceHandler(async (req, res) => {
         throw new ApiError(401, "Unauthorize Access")
     }
 
-    const { accessToken, refreshToken } = generateToken(user);
+    const { accessToken, refreshToken } = await generateToken(user);
 
 
     res
