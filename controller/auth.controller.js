@@ -123,6 +123,29 @@ export const handleUserLogin = asynceHandler(async (req, res) => {
 
 
 export const handleUserLogout = asynceHandler(async (req, res) => {
-    
-    res.status(200).json({ name: "dip" })
+
+    const x = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                refreshToken: "",
+            }
+        },
+        {
+            new: true
+        }
+    )
+    console.log(x)
+
+    res
+        .status(200)
+        .clearCookie("accessToken")
+        .clearCookie("refreshToken")
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Logout successfull"
+            )
+        )
 })

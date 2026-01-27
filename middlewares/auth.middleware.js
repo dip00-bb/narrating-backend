@@ -24,7 +24,7 @@ export const verifyUser = () => {
             req.user = user
             next()
         } catch (error) {
-            throw new ApiError(500, "Can not verify the user")
+            throw new ApiError(401, error?.message || "Can not verify the user")
         }
 
 
