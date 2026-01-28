@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
-import authConfig from '../config/env.config.js';
+import authConfig from '../auth.config.js';
+
+
 
 const connectDB = async () => {
   try {
