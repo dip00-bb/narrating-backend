@@ -149,3 +149,27 @@ export const handleUserLogout = asynceHandler(async (req, res) => {
             )
         )
 })
+
+export const forgetPassword = asynceHandler(async (req, res) => {
+    // get the user email
+    // find user in db with that email
+    // set a reset password token with expiry of one minute
+    // send that token to to the user email
+    // user will send it again
+    // compare this two token if the match and valid
+    // user will provide new password 
+    // hash it
+    // replace it with old password
+
+    // const { email } = req.body;
+    // console.log(email)
+
+    // const user = await User.findOne({ email })
+    // if (!user) {
+    //     throw new ApiError(404, "User not found")
+    // }
+
+
+
+
+})

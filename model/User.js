@@ -8,70 +8,85 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     email: {
-         type: String,
+        type: String,
         required: true,
-        unique:true
+        unique: true
     },
     password: {
-         type: String,
+        type: String,
         required: true
     },
-    role:{
-         type: String,
+    role: {
+        type: String,
     },
 
     profileImage: {
-         type: String,
+        type: String,
 
     },
     coverImage: {
-         type: String,
+        type: String,
     },
     refreshToken: {
-         type: String
+        type: String
+    },
+    resetPassToken: {
+        type: String
     }
 })
 
-userSchema.pre("save", async function (){
-    if(this.isModified("password")){
-        this.password= await bcrypt.hash(this.password,10)
+userSchema.pre("save", async function () {
+    if (this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, 10)
     }
 })
 
-userSchema.methods.isPasswordCorrect=async function (password){
+userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
 }
 
-userSchema.methods.generateAccessToken=function(){
+userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
-            _id:this._id,
-            email:this.email,
-            username:this.username,
-            role:this.role
+            _id: this._id,
+            email: this.email,
+            username: this.username,
+            role: this.role
 
         },
 
         process.env.ACCESS_TOKEN_SECRET,
 
         {
-            expiresIn:process.env.ACCESS_TOKEN_EXPIRY
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
         }
     )
 }
 
-userSchema.methods.generateRefreshToken=function (){
+userSchema.methods.generateRefreshToken = function () {
     return jwt.sign(
         {
-            _id:this._id
+            _id: this._id
         },
 
         process.env.REFRESH_TOKEN_SECRET,
 
         {
-            expiresIn:process.env.REFRESH_TOKEN_EXPIRY
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
         }
 
+    )
+}
+
+userSchema.methods.generateResetPassToken = function () {
+    return jwt.sign(
+        {
+            _id: "reset_password"
+        },
+        process.env.RESET_PASSWORD_SECRET,
+        {
+            expiresIn: process.env.RESET_PASSWORD_EXPIRY
+        }
     )
 }
 

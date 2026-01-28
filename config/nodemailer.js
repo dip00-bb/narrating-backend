@@ -19,12 +19,4 @@ export const transporter = nodemailer.createTransport(
     }
 )
 
-function sendMail(to, sub, msg) {
-    transporter.sendMail({
-        to: to,
-        subject: sub,
-        html: msg
-    })
-}
 
-// sendMail("dipchondo007@gmail.com", "Hi", "1234")
