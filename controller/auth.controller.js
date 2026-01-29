@@ -1,7 +1,9 @@
+import { transporter } from "../config/nodemailer.js";
 import User from "../model/User.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
 import { asynceHandler } from "../ulits/asyncHandler.js";
+import { sendMail } from "../ulits/sendMail.js";
 
 
 
@@ -22,6 +24,14 @@ const generateToken = async (user) => {
     user.refreshToken = refreshToken
     await user.save()
     return { accessToken, refreshToken }
+}
+
+const generateResetPassToken = async (user) => {
+    const resetPassToken = await user.generateResetPassToken(user);
+    user.resetPassToken = resetPassToken
+    await user.save()
+
+    return { resetPassToken }
 }
 
 const generateTokenOption = (tokenType) => {
@@ -150,7 +160,7 @@ export const handleUserLogout = asynceHandler(async (req, res) => {
         )
 })
 
-export const forgetPassword = asynceHandler(async (req, res) => {
+export const handleForgetPassword = asynceHandler(async (req, res) => {
     // get the user email
     // find user in db with that email
     // set a reset password token with expiry of one minute
@@ -161,15 +171,15 @@ export const forgetPassword = asynceHandler(async (req, res) => {
     // hash it
     // replace it with old password
 
-    // const { email } = req.body;
-    // console.log(email)
 
-    // const user = await User.findOne({ email })
-    // if (!user) {
-    //     throw new ApiError(404, "User not found")
-    // }
-
-
-
+    res.
+        status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Email send Suceessfully"
+            )
+        )
 
 })
