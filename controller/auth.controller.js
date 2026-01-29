@@ -4,7 +4,7 @@ import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
 import { asynceHandler } from "../ulits/asyncHandler.js";
 import { sendMail } from "../ulits/sendMail.js";
-
+import jwt from 'jsonwebtoken'
 
 
 const generateUserInfoObject = (username, email, id, __v) => {
@@ -26,13 +26,6 @@ const generateToken = async (user) => {
     return { accessToken, refreshToken }
 }
 
-const generateResetPassToken = async (user) => {
-    const resetPassToken = await user.generateResetPassToken(user);
-    user.resetPassToken = resetPassToken
-    await user.save()
-
-    return { resetPassToken }
-}
 
 const generateTokenOption = (tokenType) => {
     const accessTokenExpireAge = 15 * 60 * 1000;
@@ -43,6 +36,14 @@ const generateTokenOption = (tokenType) => {
         maxAge: tokenType === "access" ? accessTokenExpireAge : refreshTokenExpireAge
     }
 }
+
+const generatePassTokenAndSaveInDB = async (user) => {
+    const resetPassToken = await user.generateResetPassToken()
+    user.resetPassToken = resetPassToken
+    return { resetPassToken }
+}
+
+// controllers 
 
 export const handleRegisterUser = asynceHandler(async (req, res) => {
 
@@ -160,17 +161,23 @@ export const handleUserLogout = asynceHandler(async (req, res) => {
         )
 })
 
-export const handleForgetPassword = asynceHandler(async (req, res) => {
-    // get the user email
-    // find user in db with that email
-    // set a reset password token with expiry of one minute
-    // send that token to to the user email
-    // user will send it again
-    // compare this two token if the match and valid
-    // user will provide new password 
-    // hash it
-    // replace it with old password
 
+export const resetPassToken = asynceHandler(async (req, res) => {
+
+    const { email } = req.body;
+
+    const user = await User.findOne({ email: email })
+
+    if (!user) {
+        throw new ApiError(404, "User not found")
+    }
+
+    const { resetPassToken } = await generatePassTokenAndSaveInDB(user)
+
+    console.log(resetPassToken)
+
+
+    sendMail(email, "Reset Your Password", resetPassToken, transporter)
 
     res.
         status(200)
@@ -178,8 +185,8 @@ export const handleForgetPassword = asynceHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 {},
-                "Email send Suceessfully"
+                "Please Check Your Email"
             )
         )
-
 })
+
