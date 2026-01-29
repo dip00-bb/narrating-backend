@@ -81,7 +81,7 @@ userSchema.methods.generateRefreshToken = function () {
 userSchema.methods.generateResetPassToken = function () {
     return jwt.sign(
         {
-            load: "reset_password"
+            email: this.email
         },
         process.env.RESET_PASSWORD_SECRET,
         {

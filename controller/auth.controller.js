@@ -1,10 +1,11 @@
-import { transporter } from "../config/nodemailer.js";
+import axios from "axios";
 import User from "../model/User.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
 import { asynceHandler } from "../ulits/asyncHandler.js";
-import { sendMail } from "../ulits/sendMail.js";
+import { generateEmailData, sendMail } from "../ulits/sendMail.js";
 import jwt from 'jsonwebtoken'
+import authConfig from "../auth.config.js";
 
 
 const generateUserInfoObject = (username, email, id, __v) => {
@@ -174,10 +175,10 @@ export const resetPassToken = asynceHandler(async (req, res) => {
 
     const { resetPassToken } = await generatePassTokenAndSaveInDB(user)
 
-    console.log(resetPassToken)
+    const emailData = generateEmailData(email, resetPassToken)
 
+    await sendMail(emailData)
 
-    sendMail(email, "Reset Your Password", resetPassToken, transporter)
 
     res.
         status(200)
@@ -190,3 +191,52 @@ export const resetPassToken = asynceHandler(async (req, res) => {
         )
 })
 
+export const handleForgetPassword = asynceHandler(async (req, res) => {
+
+
+
+    // user will send it again
+    // compare this two token if the match and valid
+    // user will provide new password 
+    // hash it
+    // replace it with old password
+
+    const { resetToken, newPasswor } = req.body
+
+    const isVerified = jwt.verify(resetToken, process.env.RESET_PASSWORD_SECRET)
+
+    if (!isVerified) {
+        throw new ApiError(410, "expire token")
+    }
+
+    const user = await User.findOne({ email: isVerified.email })
+
+    if (user.resetPassToken !== resetToken) {
+        throw new ApiError(403, "invalid token")
+    }
+
+    await User.findOneAndUpdate(
+        { email: isVerified.email },
+
+        {
+            $set: {
+                password: newPasswor
+            }
+        },
+
+        {
+            new: true
+        }
+    )
+
+    res.
+        status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Email send Suceessfully"
+            )
+        )
+
+})
