@@ -1,11 +1,11 @@
-import axios from "axios";
+
 import User from "../model/User.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
 import { asynceHandler } from "../ulits/asyncHandler.js";
 import { generateEmailData, sendMail } from "../ulits/sendMail.js";
 import jwt from 'jsonwebtoken'
-import authConfig from "../auth.config.js";
+import redis from "../db/redis.js";
 
 
 const generateUserInfoObject = (username, email, id, __v) => {
@@ -250,7 +250,7 @@ export const handleRefreshToken = asynceHandler(async (req, res) => {
     const user = req.user
 
     const { accessToken, refreshToken } = await generateToken(user)
-
+    console.log(redis)
     const loogedInUser = generateUserInfoObject(user.username, user.email, user._id, user.__v)
     res
         .status(200)
