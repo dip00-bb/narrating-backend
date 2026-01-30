@@ -136,7 +136,7 @@ export const handleUserLogin = asynceHandler(async (req, res) => {
 
 export const handleUserLogout = asynceHandler(async (req, res) => {
 
-    const x = await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
         req.user._id,
         {
             $set: {
@@ -147,8 +147,6 @@ export const handleUserLogout = asynceHandler(async (req, res) => {
             new: true
         }
     )
-    console.log(x)
-
     res
         .status(200)
         .clearCookie("accessToken")
@@ -179,6 +177,8 @@ export const resetPassToken = asynceHandler(async (req, res) => {
 
     await sendMail(emailData)
 
+    user.resetPassToken = resetPassToken
+    user.save()
 
     res.
         status(200)
@@ -193,14 +193,6 @@ export const resetPassToken = asynceHandler(async (req, res) => {
 
 export const handleForgetPassword = asynceHandler(async (req, res) => {
 
-
-
-    // user will send it again
-    // compare this two token if the match and valid
-    // user will provide new password 
-    // hash it
-    // replace it with old password
-
     const { resetToken, newPasswor } = req.body
 
     const isVerified = jwt.verify(resetToken, process.env.RESET_PASSWORD_SECRET)
@@ -214,28 +206,46 @@ export const handleForgetPassword = asynceHandler(async (req, res) => {
     if (user.resetPassToken !== resetToken) {
         throw new ApiError(403, "invalid token")
     }
+    user.password = newPasswor;
+    user.save()
 
-    await User.findOneAndUpdate(
-        { email: isVerified.email },
-
-        {
-            $set: {
-                password: newPasswor
-            }
-        },
-
-        {
-            new: true
-        }
-    )
+    const updatedUserInfo = generateUserInfoObject(user.username, user.email, user._id, user.__v)
 
     res.
         status(200)
         .json(
             new ApiResponse(
                 200,
-                {},
-                "Email send Suceessfully"
+                { user: updatedUserInfo },
+                "Password has been changed"
+            )
+        )
+
+})
+
+export const handleChangePassword = asynceHandler(async (req, res) => {
+    const { oldPassword, newPasswor } = req.body
+
+    const user = req.user
+
+    const isValidPassword = user.isPasswordCorrect(oldPassword)
+
+    if (!isValidPassword) {
+        throw new ApiError(401, "Invalid Password")
+    }
+
+    user.password = newPasswor;
+    user.save()
+
+    const updatedUserInfo = generateUserInfoObject(user.username, user.email, user._id, user.__v)
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                { user: updatedUserInfo },
+                "Password has been changed"
             )
         )
 

@@ -16,8 +16,7 @@ export const verifyUser = () => {
                 throw new ApiError(401, "unauthorize access");
             }
 
-            const user = await User.findById(decoded._id).select("-password -refreshToken")
-
+            const user = await User.findById(decoded._id)
             if (!user) {
                 throw new ApiError(404, "no user found")
             }
