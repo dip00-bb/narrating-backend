@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 
 export const verifyUser = () => {
     return async (req, res, next) => {
-        const {accessToken} = req.cookies;
+        const { accessToken } = req.cookies;
         try {
             if (!accessToken) {
                 throw new ApiError(401, "unauthorize access");
@@ -20,6 +20,38 @@ export const verifyUser = () => {
             if (!user) {
                 throw new ApiError(404, "no user found")
             }
+            req.user = user
+            next()
+        } catch (error) {
+            throw new ApiError(401, error?.message || "Can not verify the user")
+        }
+    }
+}
+
+export const verifyRefreshToken = () => {
+    return async (req, res, next) => {
+        const { refreshToken } = req.cookies;
+        try {
+            if (!refreshToken) {
+                throw new ApiError(401, "unauthorize access");
+            }
+
+            const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+            if (!decoded) {
+                throw new ApiError(401, "unauthorize access");
+            }
+
+            const user = await User.findById(decoded._id)
+            if (!user) {
+                throw new ApiError(404, "no user found")
+            }
+
+
+            if (user.refreshToken !== refreshToken) {
+                throw new ApiError(403, "Access Forbidden");
+            }
+
             req.user = user
             next()
         } catch (error) {
