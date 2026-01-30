@@ -27,7 +27,6 @@ const generateToken = async (user) => {
     return { accessToken, refreshToken }
 }
 
-
 const generateTokenOption = (tokenType) => {
     const accessTokenExpireAge = 15 * 60 * 1000;
     const refreshTokenExpireAge = 30 * 24 * 60 * 60 * 1000
@@ -40,9 +39,8 @@ const generateTokenOption = (tokenType) => {
 
 const generatePassTokenAndSaveInDB = async (user) => {
     const resetPassToken = await user.generateResetPassToken()
-    user.resetPassToken = resetPassToken
     return { resetPassToken }
-}  //todo--> bug here
+}
 
 // controllers 
 
@@ -158,7 +156,6 @@ export const handleUserLogout = asynceHandler(async (req, res) => {
         )
 })
 
-
 export const resetPassToken = asynceHandler(async (req, res) => {
 
     const { email } = req.body;
@@ -254,6 +251,7 @@ export const handleRefreshToken = asynceHandler(async (req, res) => {
 
     const { accessToken, refreshToken } = await generateToken(user)
 
+    const loogedInUser = generateUserInfoObject(user.username, user.email, user._id, user.__v)
     res
         .status(200)
         .cookie("accessToken", accessToken, generateTokenOption("access"))
