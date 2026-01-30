@@ -42,7 +42,7 @@ const generatePassTokenAndSaveInDB = async (user) => {
     const resetPassToken = await user.generateResetPassToken()
     user.resetPassToken = resetPassToken
     return { resetPassToken }
-}
+}  //todo--> bug here
 
 // controllers 
 
@@ -249,6 +249,21 @@ export const handleChangePassword = asynceHandler(async (req, res) => {
 
 })
 
-// export const handleRefreshToken = asynceHandler(async (req, res) => {
-//     const {}
-// })
+export const handleRefreshToken = asynceHandler(async (req, res) => {
+    const user = req.user
+
+    const { accessToken, refreshToken } = await generateToken(user)
+
+    res
+        .status(200)
+        .cookie("accessToken", accessToken, generateTokenOption("access"))
+        .cookie("refreshToken", refreshToken, generateTokenOption("refresh"))
+        .json(
+            new ApiResponse(
+                200,
+                { user: loogedInUser },
+                "Log in successfull"
+            )
+        )
+
+})
