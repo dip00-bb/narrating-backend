@@ -2,7 +2,7 @@ import Redis from 'ioredis'
 import dotenv from 'dotenv'
 dotenv.config()
 
-console.log("eeee",process.env.REDIS_HOST)
+
 const redis = new Redis({
     username: process.env.REDIS_USERNAME,
     password: process.env.REDIS_PASSWORD,

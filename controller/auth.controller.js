@@ -156,10 +156,9 @@ export const handleUserLogout = asynceHandler(async (req, res) => {
         )
 })
 
-export const resetPassToken = asynceHandler(async (req, res) => {
+export const resetPassToken =  asynceHandler(async (req, res) => {
 
     const { email } = req.body;
-
     const user = await User.findOne({ email: email })
 
     if (!user) {
@@ -250,7 +249,6 @@ export const handleRefreshToken = asynceHandler(async (req, res) => {
     const user = req.user
 
     const { accessToken, refreshToken } = await generateToken(user)
-    console.log(redis)
     const loogedInUser = generateUserInfoObject(user.username, user.email, user._id, user.__v)
     res
         .status(200)
@@ -264,4 +262,6 @@ export const handleRefreshToken = asynceHandler(async (req, res) => {
             )
         )
 
-})
+}) 
+
+
