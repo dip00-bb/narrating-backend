@@ -17,4 +17,4 @@ router.post('/forget-password', handleForgetPassword)
 router.post('/change-password', verifyUser(), handleChangePassword)
 router.post('/refresh-token', verifyRefreshToken(), handleRefreshToken)
 
-export default router
+export default router        

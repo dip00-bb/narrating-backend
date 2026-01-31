@@ -1,13 +1,13 @@
-import express from 'express' 
+import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-
-const app=express()
+import { errorHandler } from './middlewares/error.middleware.js'
+const app = express()
 
 
 app.use(cors({
-    origin:process.env.CORS_ORIGIN,
-    credential:true
+    // origin:process.env.CORS_ORIGIN,
+    credential: true
 }))
 
 
@@ -17,6 +17,9 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 import authRouter from './routes/auth.router.js'
-app.use('/api/auth/',authRouter)
 
-export {app}
+app.use('/api/auth/', authRouter)
+
+
+app.use(errorHandler)
+export { app }
