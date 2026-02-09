@@ -17,9 +17,11 @@ app.use(express.static("public"))
 app.use(cookieParser())
 
 import authRouter from './routes/auth.router.js'
+import { createApolloServer } from './graphql/index.js'
 
 app.use('/api/auth/', authRouter)
 
+await createApolloServer(app)
 
 app.use(errorHandler)
 export { app }
