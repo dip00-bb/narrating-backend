@@ -3,6 +3,7 @@ const Blog=[
         _id:"123",
         title:"Hello world",
         description:"I am hello world blog"
+        
     }
 
 ]
@@ -10,7 +11,7 @@ const Blog=[
 export const blogResolver={
     Query:{
         blogs: async ()=>{
-            return 
+            return Blog
         }
     }
 }

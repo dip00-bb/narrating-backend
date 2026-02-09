@@ -2,13 +2,13 @@ import gql from "graphql-tag";
 
 export const blogTypeDefs=gql`
     type Blog{
-        _id:ID!
+        _id:String!
         title:String!
         description:String!
     }
 
 
     type Query{
-        blog:[Blog!]!
+        blogs:[Blog!]!
     }
 `
