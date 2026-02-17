@@ -13,6 +13,8 @@ const blogSchema = new Schema({
         type: Schema.Types.Mixed,
         require: true
     }
+},{
+    timestamps:true
 })
 
 const Blog = mongoose.model("Blog", blogSchema)
