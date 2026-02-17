@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { Schema } from "mongoose";
 
-const blogSchema = new mongoose.Schema({
+const blogSchema = new Schema({
     creatotId: {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -10,7 +10,7 @@ const blogSchema = new mongoose.Schema({
         require: true
     },
     content: {
-        type: String,
+        type: Schema.Types.Mixed,
         require: true
     }
 })
