@@ -2,9 +2,10 @@ import { model, Schema } from "mongoose"
 
 
 const blogSchema = new Schema({
-    creatotId: {
+    creatorId: {
         type: Schema.Types.ObjectId,
         ref: "User",
+        required: true
     },
     title: {
         type: String,

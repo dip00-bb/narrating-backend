@@ -3,9 +3,14 @@ import { ApiResponse } from "../ulits/ApiResponse.js"
 import { asynceHandler } from "../ulits/asyncHandler.js"
 
 export const handleCreateNewBlog = asynceHandler(async(req, res)=>{
-    const blogData=req.body;
+    const {content,coverImage,title}=req.body;
 
-    await Blog.create(blogData)
+    await Blog.create({
+        creatorId:req.user._id,
+        content,
+        coverImage,
+        title,
+    })
 
         res
         .status(200)
