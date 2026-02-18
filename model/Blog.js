@@ -1,4 +1,5 @@
-import { Schema } from "mongoose";
+import { model, Schema } from "mongoose"
+
 
 const blogSchema = new Schema({
     creatotId: {
@@ -7,16 +8,20 @@ const blogSchema = new Schema({
     },
     title: {
         type: String,
-        require: true
+        required: true
+    },
+    coverImage:{
+        type:String,
+        required:true
     },
     content: {
         type: Schema.Types.Mixed,
-        require: true
+        required: true
     }
 },{
     timestamps:true
 })
 
-const Blog = mongoose.model("Blog", blogSchema)
+const Blog = model("Blog", blogSchema)
 
 export default Blog
