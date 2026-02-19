@@ -1,10 +1,16 @@
 import gql from "graphql-tag";
 
-export const blogTypeDefs=gql`
+
+export const blogTypeDefs = gql`
+    scalar JSON
     type Blog{
-        _id:String!
-        title:String!
-        description:String!
+        id: ID!
+        creatorId: ID!
+        title: String!
+        coverImage: String
+        content: JSON!
+        createdAt: String!
+        updatedAt: String!
     }
 
 
