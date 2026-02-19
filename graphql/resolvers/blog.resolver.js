@@ -1,17 +1,10 @@
-const Blog=[
-    {
-        _id:"123",
-        title:"Hello world",
-        description:"I am hello world blog"
-        
-    }
-
-]
+import Blog from "../../model/Blog.js"
 
 export const blogResolver={
     Query:{
-        blogs: async ()=>{
-            return Blog
+        blogs: async (_,__,context)=>{
+            const blogs=await Blog.find({})
+            return blogs
         }
     }
 }
