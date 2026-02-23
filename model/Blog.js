@@ -25,7 +25,7 @@ const blogSchema = new Schema({
     },
     comments:{
         type:Schema.Types.ObjectId,
-        ref:"Comments"
+        ref:"Comment"
     },
     totalViews:{
         type:Number
