@@ -9,9 +9,9 @@ export const contextFunction = async ({ req }) => {
     if (accessToken) {
         try {
             const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
-            user =await User.findById(decoded._id)
+            user = await User.findById(decoded._id)
         } catch (error) {
-            console.log("Invalid token")
+            user=null
         }
     }
 

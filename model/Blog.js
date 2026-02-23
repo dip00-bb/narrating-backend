@@ -15,6 +15,21 @@ const blogSchema = new Schema({
         type:String,
         required:true
     },
+    totalLikes:{
+        type:Number,
+        default:0
+    },
+    totalComment:{
+        type:Number,
+        default:0
+    },
+    comments:{
+        type:Schema.Types.ObjectId,
+        ref:"Comments"
+    },
+    totalViews:{
+        type:Number
+    },
     content: {
         type: Schema.Types.Mixed,
         required: true
