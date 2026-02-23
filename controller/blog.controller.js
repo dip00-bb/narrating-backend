@@ -56,7 +56,7 @@ export const handleDislikeBlog = asynceHandler(async (req, res) => {
         { _id: id },
         {
             $inc: {
-                totalLikes: 1
+                totalLikes: -1
             }
         }
     )
