@@ -27,8 +27,6 @@ export const handleCreateNewBlog = asynceHandler(async (req, res) => {
 export const handleLikeBlog = asynceHandler(async (req, res) => {
     const { id } = req.params
 
-    console.log(id)
-
     await Blog.updateOne(
         { _id: id },
         {
@@ -45,6 +43,31 @@ export const handleLikeBlog = asynceHandler(async (req, res) => {
                 200,
                 {},
                 "Like Added"
+            )
+        )
+})
+
+
+export const handleDislikeBlog = asynceHandler(async (req, res) => {
+    const { id } = req.params
+
+
+    await Blog.updateOne(
+        { _id: id },
+        {
+            $inc: {
+                totalLikes: 1
+            }
+        }
+    )
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                ""
             )
         )
 })
