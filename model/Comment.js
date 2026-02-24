@@ -4,22 +4,22 @@ const commentSchema = new Schema({
 
     author: {
         type: String,
-        require: true
+        required: true
     },
     authorId: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        require: true
+        required: true
     },
     comment: {
         type: Schema.Types.Mixed,
-        require: true
+        required: true
     },
 
     blogId: {
         type: Schema.Types.ObjectId,
         ref: "Blog",
-        require: true
+        required: true
     },
     replideTo: {
         type: Schema.Types.ObjectId,
