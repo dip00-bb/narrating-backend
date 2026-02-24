@@ -47,7 +47,6 @@ const generatePassTokenAndSaveInDB = async (user) => {
 export const handleRegisterUser = asynceHandler(async (req, res) => {
 
     const { username, email, password } = req.body
-    console.log(req.body)
     if (!username) {
         throw new ApiError(400, "username is required")
     }
