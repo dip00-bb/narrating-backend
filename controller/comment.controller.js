@@ -154,3 +154,34 @@ export const handleLikeComment = asynceHandler(async (req, res) => {
         )
 
 })
+
+export const handleDislikeComment = asynceHandler(async (req, res) => {
+    const { commentId } = req.params
+
+    if (!commentId) {
+        throw new ApiError(400,"No comment Id Found")
+    }
+
+    const likedComment = await Comment.findByIdAndUpdate(commentId,
+        {
+            $inc: {
+                like: -1
+            }
+        })
+
+    
+    if(!likedComment){
+        throw new ApiError (404.,"No comment found with this Id")
+    }    
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "You disliked comment"
+            )
+        )
+
+})
