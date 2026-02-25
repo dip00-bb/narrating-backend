@@ -21,13 +21,16 @@ const commentSchema = new Schema({
         ref: "Blog",
         required: true
     },
+    like: {
+        type: Number,
+    },
     replideTo: {
         type: Schema.Types.ObjectId,
         ref: "Comment"
     }
-},{
-    timestamps:true
+}, {
+    timestamps: true
 })
 
-const Comment=model("Comment",commentSchema)
+const Comment = model("Comment", commentSchema)
 export default Comment
