@@ -47,9 +47,9 @@ export const handleUpdateComment = asynceHandler(async (req, res) => {
         throw new ApiError(400, "Content Field Can't be Empty")
     }
 
-    const updatedDocument = await Comment.findByIdAndUpdate(id, { comment: content },{new:true})
+    const updatedDocument = await Comment.findByIdAndUpdate(id, { comment: content }, { new: true })
 
-    if(!updatedDocument){
+    if (!updatedDocument) {
         throw new ApiError(404, "No Comment Found")
     }
 
@@ -60,6 +60,32 @@ export const handleUpdateComment = asynceHandler(async (req, res) => {
                 200,
                 {},
                 "Comment updated Successfully"
+            )
+        )
+
+})
+
+
+export const handleDeleteComment = asynceHandler(async (req, res) => {
+    const { id } = req.params
+
+    if (!id) {
+        throw new ApiError(400, "Comment Id not found")
+    }
+
+    const deletedDocument = await Comment.findByIdAndDelete(id)
+    if (!deletedDocument) {
+        throw new ApiError(404, "No Comment Found")
+    }
+
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Comment deleted Successfully"
             )
         )
 
