@@ -6,10 +6,10 @@ import { asynceHandler } from "../ulits/asyncHandler.js";
 
 export const handleAddComment = asynceHandler(async (req, res) => {
     const { id } = req.params
-    const {content}=req.body
+    const { content } = req.body
 
-    if(!content){
-        throw new ApiError(400,"Content Field Can't be Empty")
+    if (!content) {
+        throw new ApiError(400, "Content Field Can't be Empty")
     }
 
     const commentorId = req.user.id
@@ -18,11 +18,11 @@ export const handleAddComment = asynceHandler(async (req, res) => {
 
 
     await Comment.create({
-        author:commentor.username,
-        authorId:commentor._id,
-        blogId:id,
-        comment:content,
-        replideTo:null
+        author: commentor.username,
+        authorId: commentor._id,
+        blogId: id,
+        comment: content,
+        replideTo: null
 
     })
 
@@ -39,3 +39,28 @@ export const handleAddComment = asynceHandler(async (req, res) => {
 })
 
 
+export const handleUpdateComment = asynceHandler(async (req, res) => {
+    const { id } = req.params
+    const { content } = req.body
+
+    if (!content) {
+        throw new ApiError(400, "Content Field Can't be Empty")
+    }
+
+    const updatedDocument = await Comment.findByIdAndUpdate(id, { comment: content },{new:true})
+
+    if(!updatedDocument){
+        throw new ApiError(404, "No Comment Found")
+    }
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Comment updated Successfully"
+            )
+        )
+
+})
