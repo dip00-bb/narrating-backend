@@ -23,6 +23,7 @@ const commentSchema = new Schema({
     },
     like: {
         type: Number,
+        default:0
     },
     replideTo: {
         type: Schema.Types.ObjectId,
