@@ -15,6 +15,6 @@ export const blogTypeDefs = gql`
 
 
     type Query{
-        blogs:[Blog!]!
+        blogs(creatorId:ID):[Blog!]!
     }
 `
