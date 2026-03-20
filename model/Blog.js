@@ -33,6 +33,12 @@ const blogSchema = new Schema({
     content: {
         type: Schema.Types.Mixed,
         required: true
+    },
+    status:{
+        type: String,
+        required:true,
+        enum:['approved','suspended'],
+        default:'approved'
     }
 },{
     timestamps:true
