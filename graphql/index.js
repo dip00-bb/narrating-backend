@@ -9,7 +9,8 @@ import { contextFunction } from "./context.js"
 export const createApolloServer= async(app)=>{
     const server=new ApolloServer({
         typeDefs:typeDefs,
-        resolvers:resolvers
+        resolvers:resolvers,
+        includeStacktraceInErrorResponses: process.env.NODE_ENV === "development" 
     })
 
     await server.start()
