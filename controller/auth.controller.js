@@ -2,7 +2,7 @@
 import User from "../model/User.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
-import { asynceHandler } from "../ulits/asyncHandler.js";
+import { asyncHandler } from "../ulits/asyncHandler.js";
 import { generateEmailData, sendMail } from "../ulits/sendMail.js";
 import jwt from 'jsonwebtoken'
 import redis from "../db/redis.js";
@@ -44,7 +44,7 @@ const generatePassTokenAndSaveInDB = async (user) => {
 
 // controllers 
 
-export const handleRegisterUser = asynceHandler(async (req, res) => {
+export const handleRegisterUser = asyncHandler(async (req, res) => {
 
     const { username, email, password } = req.body
     if (!username) {
@@ -84,7 +84,7 @@ export const handleRegisterUser = asynceHandler(async (req, res) => {
         ))
 })
 
-export const handleUserLogin = asynceHandler(async (req, res) => {
+export const handleUserLogin = asyncHandler(async (req, res) => {
 
     const { email, password } = req.body
 
@@ -129,7 +129,7 @@ export const handleUserLogin = asynceHandler(async (req, res) => {
 
 })
 
-export const handleUserLogout = asynceHandler(async (req, res) => {
+export const handleUserLogout = asyncHandler(async (req, res) => {
 
     await User.findByIdAndUpdate(
         req.user._id,
@@ -155,7 +155,7 @@ export const handleUserLogout = asynceHandler(async (req, res) => {
         )
 })
 
-export const resetPassToken = asynceHandler(async (req, res) => {
+export const resetPassToken = asyncHandler(async (req, res) => {
 
     const { email } = req.body;
     const user = await User.findOne({ email: email })
@@ -184,7 +184,7 @@ export const resetPassToken = asynceHandler(async (req, res) => {
         )
 })
 
-export const handleForgetPassword = asynceHandler(async (req, res) => {
+export const handleForgetPassword = asyncHandler(async (req, res) => {
 
     const { resetToken, newPasswor } = req.body
 
@@ -216,7 +216,7 @@ export const handleForgetPassword = asynceHandler(async (req, res) => {
 
 })
 
-export const handleChangePassword = asynceHandler(async (req, res) => {
+export const handleChangePassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPasswor } = req.body
 
     const user = req.user
@@ -244,7 +244,7 @@ export const handleChangePassword = asynceHandler(async (req, res) => {
 
 })
 
-export const handleRefreshToken = asynceHandler(async (req, res) => {
+export const handleRefreshToken = asyncHandler(async (req, res) => {
     const user = req.user
 
     const { accessToken, refreshToken } = await generateToken(user)

@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary"
-import { asynceHandler } from "../ulits/asyncHandler.js";
+import { asyncHandler } from "../ulits/asyncHandler.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
 
 
@@ -10,7 +10,7 @@ cloudinary.config({
 });
 
 
-export const handleVerifySignedUpload = asynceHandler(async (req, res) => {
+export const handleVerifySignedUpload = asyncHandler(async (req, res) => {
 
 
 

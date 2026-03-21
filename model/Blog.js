@@ -37,13 +37,14 @@ const blogSchema = new Schema({
     status:{
         type: String,
         required:true,
-        enum:['approved','suspended'],
-        default:'approved'
+        enum:['approved','suspended','editing']
     }
 },{
     timestamps:true
 })
 
-const Blog = model("Blog", blogSchema)
+const Blog = model("Blog", blogSchema);
+const Draft=model("Draft",blogSchema)
+const Updatable=model("Updatable",blogSchema)
 
-export default Blog
+export default {Blog,Draft,Updatable}

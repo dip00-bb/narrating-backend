@@ -2,9 +2,9 @@ import Comment from "../model/Comment.js";
 import User from "../model/User.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
-import { asynceHandler } from "../ulits/asyncHandler.js";
+import { asyncHandler } from "../ulits/asyncHandler.js";
 
-export const handleAddComment = asynceHandler(async (req, res) => {
+export const handleAddComment = asyncHandler(async (req, res) => {
     const { blogId } = req.params // blog id
     const { content } = req.body
 
@@ -39,7 +39,7 @@ export const handleAddComment = asynceHandler(async (req, res) => {
 })
 
 
-export const handleUpdateComment = asynceHandler(async (req, res) => {
+export const handleUpdateComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
     const { content } = req.body
 
@@ -66,7 +66,7 @@ export const handleUpdateComment = asynceHandler(async (req, res) => {
 })
 
 
-export const handleDeleteComment = asynceHandler(async (req, res) => {
+export const handleDeleteComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
 
     if (!commentId) {
@@ -92,7 +92,7 @@ export const handleDeleteComment = asynceHandler(async (req, res) => {
 })
 
 
-export const handleReplayComment = asynceHandler(async (req, res) => {
+export const handleReplayComment = asyncHandler(async (req, res) => {
     const { commentId, blogId } = req.params
 
     console.log(commentId, blogId)
@@ -124,7 +124,7 @@ export const handleReplayComment = asynceHandler(async (req, res) => {
 
 })
 
-export const handleLikeComment = asynceHandler(async (req, res) => {
+export const handleLikeComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
 
     if (!commentId) {
@@ -155,7 +155,7 @@ export const handleLikeComment = asynceHandler(async (req, res) => {
 
 })
 
-export const handleDislikeComment = asynceHandler(async (req, res) => {
+export const handleDislikeComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
 
     if (!commentId) {
