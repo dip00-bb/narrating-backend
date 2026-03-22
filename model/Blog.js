@@ -45,6 +45,6 @@ const blogSchema = new Schema({
 
 const Blog = model("Blog", blogSchema);
 const Draft=model("Draft",blogSchema)
-const Updatable=model("Updatable",blogSchema)
 
-export default {Blog,Draft,Updatable}
+
+export default {Blog,Draft}
