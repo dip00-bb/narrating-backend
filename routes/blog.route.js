@@ -3,14 +3,14 @@ import { handleCreateDraft, handleDislikeBlog, handleLikeBlog, handlePublishBlog
 import { verifyUser } from "../middlewares/auth.middleware.js";
 import { validator } from "../middlewares/validationMiddleware.js";
 import { blogSchema } from "../schemas/blogSchema.js";
-
+import Model from '../model/Blog.js'
 const router=Router()
 
 router.post('/create-draft-blog',verifyUser(),validator(blogSchema), handleCreateDraft)
 
 router.patch('/update-in-draft/:id',verifyUser(),validator(blogSchema),handleUpdateInDraft)
 
-router.post('/publish-blog/:id',handlePublishBlog)
+router.post('/publish-blog/:id',handlePublishBlog(Model.Draft,Model.Blog))
 
 router.post('/like-blog/:id', handleLikeBlog)
 

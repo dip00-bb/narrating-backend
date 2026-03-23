@@ -9,7 +9,7 @@ export const handleStageUpUpdateBlog = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
     let targetedBlog
-
+    let existInDraft = true;
 
     const selectedBlog = await checkDocumentExist(Model.Blog, { _id: id })
 
@@ -28,6 +28,8 @@ export const handleStageUpUpdateBlog = asyncHandler(async (req, res) => {
             "coverImage": selectedBlog.coverImage,
             "content": selectedBlog.content
         }
+
+        existInDraft = false
     }
 
     res
@@ -35,8 +37,81 @@ export const handleStageUpUpdateBlog = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                targetedBlog, // send it to the user
+                {
+                    "blogInfo": targetedBlog,
+                    "existInDraft": existInDraft
+                },
                 "Blog Created Successfully"
             )
         )
 })
+
+
+export const handleUpdateBlog = asyncHandler(async (req, res) => {
+    const { content, coverImage, title } = req.body
+    const { id } = req.params
+    let updatedBlog;
+
+    updatedBlog = await Updatable.findOneAndUpdate(
+        {
+            updatableBlogId: id
+        },
+        {
+            content,
+            coverImage,
+            title
+        },
+        {
+            new: true,
+            upsert: true
+        }
+    )
+
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    updatedBlog
+                },
+                "Blog Updated Successfully"
+            )
+        )
+})
+
+
+export const handlePublishUpdatedBlog = (draftModel, updatedModel) =>
+    asyncHandler(async (req, res) => {
+
+        const { id } = req.params;
+
+        const updatedBlogData = await findDraftBlogAndDeleteId(draftModel, id)
+
+        const updateBlog = await updatedModel.findByIdAndUpdate(
+            updatedBlogData.updatableBlogId,
+            {
+                content: updatedBlogData.content,
+                coverImage: updatedBlogData.coverImage,
+                title: updatedBlogData.title
+            },
+            {
+                new: true
+            }
+        )
+
+        if (!updateBlog) {
+            throw new ApiError(400, "Can not update blog. Try Again")
+        }
+
+        res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    updateBlog,
+                    "Blog Created Successfully"
+                )
+            )
+    })
