@@ -7,3 +7,13 @@ export const notFoundError=(message)=>{
         }
     })
 }
+
+export const editorAndAuthorNotSame = (authorId, manipulator,message) => {
+    if (authorId.toString() !== manipulator.toString()) {
+        throw new GraphQLError(message,{
+            extensions:{
+                code:'PERMISSION DENIED'
+            }
+        })
+    }
+}

@@ -7,10 +7,8 @@ import { checkDocumentExist, editorAndAuthorNotSame } from "../ulits/customRestE
 
 export const handleStageUpUpdateBlog = asyncHandler(async (req, res) => {
     const { id } = req.params;
-
     let targetedBlog
     let existInDraft = true;
-
     const selectedBlog = await checkDocumentExist(Model.Blog, { _id: id })
 
     if (!selectedBlog) {
