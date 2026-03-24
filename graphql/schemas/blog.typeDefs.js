@@ -9,6 +9,9 @@ export const blogTypeDefs = gql`
         title: String!
         coverImage: String
         content: JSON!
+        comments:ID!
+        totalViews:Int!
+        status:String!
         createdAt: String!
         updatedAt: String!
     }
