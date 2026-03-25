@@ -1,7 +1,9 @@
 import Model from "../model/Blog.js";
+import Updatable from "../model/UpdatableBlog.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js"
 import { asyncHandler } from "../ulits/asyncHandler.js"
+import { checkDocumentExist, editorAndAuthorNotSame } from "../ulits/customRestError.js";
 
 
 export const findDraftBlogAndDeleteId = async (draftModel, id) => {
@@ -82,10 +84,10 @@ export const handlePublishBlog = (draftModel, updatedModel) =>
 
         const updatedBlog = await findDraftBlogAndDeleteId(draftModel, id)
 
-        
+
         const blog = await updatedModel.create({
             ...updatedBlog,
-            status:"approved" // before save make status approve
+            status: "approved" // before save make status approve
         })
 
         if (!blog) {
@@ -149,3 +151,33 @@ export const handleDislikeBlog = asyncHandler(async (req, res) => {
         )
 })
 
+
+export const handleDeleteBlog = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const blog = await checkDocumentExist(Model.Blog, { _id: id });
+
+    if (!blog) {
+        throw new ApiError(404, "Blog not found");
+    }
+
+    editorAndAuthorNotSame(blog.creatorId, req.user._id);
+
+
+    await Model.Blog.deleteOne({ _id: id });
+
+    const stagedUpBlog = await checkDocumentExist(Updatable, { updatableBlogId: id });
+ 
+    if (stagedUpBlog) {
+        await Updatable.deleteOne({ updatableBlogId: id });
+    }
+
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            {},
+            "Blog deleted successfully"
+        )
+    );
+});
