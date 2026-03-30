@@ -1,4 +1,5 @@
 import Model from "../model/Blog.js";
+import Comment from "../model/Comment.js";
 import Updatable from "../model/UpdatableBlog.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js"
@@ -165,6 +166,8 @@ export const handleDeleteBlog = asyncHandler(async (req, res) => {
 
     await Model.Blog.deleteOne({ _id: id });
 
+    // TODO delete all the related comment of that blog
+    
     const stagedUpBlog = await checkDocumentExist(Updatable, { updatableBlogId: id });
  
     if (stagedUpBlog) {

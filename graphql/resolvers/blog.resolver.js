@@ -12,6 +12,11 @@ export const blogResolver = {
             if (args.creatorId) {
                 filter.creatorId = args.creatorId
             }
+
+            if(args.category){
+                filter.category=args.category
+            }
+
             const blogs = await Model.Blog.find(filter)
 
             if (!blogs || blogs.length == 0) {
