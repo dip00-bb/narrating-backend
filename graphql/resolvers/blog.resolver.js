@@ -1,6 +1,8 @@
 
 import redis from "../../db/redis.js"
+import Blog from "../../model/Blog.js"
 import Model from "../../model/Blog.js"
+import { redisKeys } from "../../ulits/redisKeyGenerator.js"
 import { notFoundError } from "../custom_error/gqlCustomError.js"
 
 export const blogResolver = {
@@ -13,11 +15,11 @@ export const blogResolver = {
                 filter.creatorId = args.creatorId
             }
 
-            if(args.category){
-                filter.category=args.category
+            if (args.category) {
+                filter.category = args.category
             }
 
-            const blogs = await Model.Blog.find(filter)
+            const blogs = await Blog.find(filter)
 
             if (!blogs || blogs.length == 0) {
                 notFoundError("No Blog Found For This Author")
@@ -27,17 +29,17 @@ export const blogResolver = {
 
         blog: async (_, { id }, context) => {
 
-            const key = `blog:${id}:content`
-            console.log(key)
+            const key = redisKeys.blog(id)
+
             const cachedBlog = await redis.get(key) // look for cached data
 
-            if(cachedBlog){ 
-                const parsedBlog=JSON.parse(cachedBlog)
+            if (cachedBlog) {
+                const parsedBlog = JSON.parse(cachedBlog)
                 return parsedBlog // return cached data
             }
 
 
-            const blog = await Model.Blog.findOne({
+            const blog = await Blog.findOne({
                 _id: id
             })
 

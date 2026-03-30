@@ -1,6 +1,4 @@
 import Model from "../model/Blog.js";
-import Comment from "../model/Comment.js";
-import Updatable from "../model/UpdatableBlog.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js"
 import { asyncHandler } from "../ulits/asyncHandler.js"
@@ -78,6 +76,8 @@ export const handleUpdateInDraft = asyncHandler(async (req, res) => {
             )
         )
 })
+
+
 //Todo change ta status before publish
 export const handlePublishBlog = (draftModel, updatedModel) =>
     asyncHandler(async (req, res) => {

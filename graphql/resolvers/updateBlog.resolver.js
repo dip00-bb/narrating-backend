@@ -1,7 +1,9 @@
 import { checkDocumentExist } from "../../ulits/customRestError.js";
-import Model from "../../model/Blog.js"
 import { editorAndAuthorNotSame, notFoundError } from "../custom_error/gqlCustomError.js";
-import Updatable from "../../model/UpdatableBlog.js";
+import { redisKeys } from "../../ulits/redisKeyGenerator.js";
+import redis from "../../db/redis.js";
+import { ApiError } from "../../ulits/ApiError.js";
+import Blog from "../../model/Blog.js";
 
 export const updateBlogResolver = {
     Query: {
@@ -10,16 +12,22 @@ export const updateBlogResolver = {
             let targetedBlog
             let existInDraft = true;
 
+            if (!context.user) {
+                throw new ApiError(401, "Unauthorize Access")
+            }
 
-            const selectedBlog = await checkDocumentExist(Model.Blog, { _id: id })
-
+            const selectedBlog = await checkDocumentExist(Blog, { _id: id })
             if (!selectedBlog) {
                 notFoundError("No Blog Found")
             }
 
             editorAndAuthorNotSame(selectedBlog.creatorId, context.user._id, "You are not permitted to edit this blog")
 
-            targetedBlog = await checkDocumentExist(Updatable, { updatableBlogId: id })
+            const targetedBlogKey = redisKeys.updatableBlog(id)
+
+            targetedBlog = await redis.get(targetedBlogKey)
+
+
 
             if (!targetedBlog) {
                 targetedBlog = {
@@ -32,16 +40,16 @@ export const updateBlogResolver = {
                 existInDraft = false
             }
 
-            
-
             if (existInDraft) {
-                targetedBlog.existInDraft=existInDraft
-                return targetedBlog
-            }else{
-                targetedBlog.updatableBlogId=id
+                const parsedTargetedBlog = JSON.parse(targetedBlog)
+                parsedTargetedBlog.existInDraft = existInDraft
+                parsedTargetedBlog.updatableBlogId = id
+                return parsedTargetedBlog
+            } else {
+                targetedBlog.updatableBlogId = id
                 return { ...targetedBlog, existInDraft }
             }
-            
+
         }
     }
 }

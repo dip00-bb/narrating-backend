@@ -1,115 +1,96 @@
-import Updatable from "../model/UpdatableBlog.js";
-import Model from "../model/Blog.js"
 import { asyncHandler } from "../ulits/asyncHandler.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
-import { checkDocumentExist, editorAndAuthorNotSame } from "../ulits/customRestError.js";
+import redis from "../db/redis.js";
+import { redisKeys } from "../ulits/redisKeyGenerator.js";
+import Blog from "../model/Blog.js";
 
-export const handleStageUpUpdateBlog = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    let targetedBlog
-    let existInDraft = true;
-    const selectedBlog = await checkDocumentExist(Model.Blog, { _id: id })
 
-    if (!selectedBlog) {
-        throw new ApiError(404, "Blog not found")
-    }
 
-    editorAndAuthorNotSame(selectedBlog.creatorId, req.user._id)
 
-    targetedBlog = await checkDocumentExist(Updatable, { updatableBlogId: id })
 
-    if (!targetedBlog) {
-        targetedBlog = {
-            "_id": selectedBlog._id,
-            "title": selectedBlog.title,
-            "coverImage": selectedBlog.coverImage,
-            "content": selectedBlog.content
-        }
+export const handleUpdateBlog = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const key = redisKeys.updatableBlog(id)
+    const updatedContent = req.body
 
-        existInDraft = false
-    }
+    const stringifiedJson = JSON.stringify({ ...updatedContent, id: id })
+
+
+    await redis.set(key, stringifiedJson)
+    await redis.expire(key, 5256000)
+
 
     res
         .status(200)
         .json(
             new ApiResponse(
                 200,
-                {
-                    "blogInfo": targetedBlog,
-                    "existInDraft": existInDraft
-                },
-                "Blog Created Successfully"
+                {},
+                ""
             )
         )
 })
 
 
-export const handleUpdateBlog = asyncHandler(async (req, res) => {
-    const { content, coverImage, title } = req.body
-    const { id } = req.params
-    let updatedBlog;
+export const handlePublishUpdatedBlog = asyncHandler(async (req, res) => {
 
-    updatedBlog = await Updatable.findOneAndUpdate(
+    const { id } = req.params;
+    const updatedBlogKey = redisKeys.updatableBlog(id)
+
+
+    const updatedBlogData = await redis.get(updatedBlogKey)
+
+    if (!updatedBlogData) {
+        throw new ApiError(404, "Blog not found")
+    }
+
+
+
+    const parsedUpdatableBlog = JSON.parse(updatedBlogData)
+
+
+    const updatedBlog = await Blog.findByIdAndUpdate(
+        parsedUpdatableBlog.id,
         {
-            updatableBlogId: id
+            content: parsedUpdatableBlog.content,
+            coverImage: parsedUpdatableBlog.coverImage,
+            title: parsedUpdatableBlog.title
         },
         {
-            content,
-            coverImage,
-            title
-        },
-        {
-            new: true,
-            upsert: true
+            new: true
         }
     )
 
 
+    if (!updatedBlog) {
+        throw new ApiError(400, "Can not update blog. Try Again")
+    }
+
+
+
+    const targetedKey = redisKeys.blog(id)
+
+    const stringifiedUpdatedBlog = JSON.stringify(updatedBlog)
+
+    // also update in cache if it the same blog are saved saved
+    await redis.set(
+        targetedKey,
+        stringifiedUpdatedBlog,
+        "EX",
+        2628000,
+        "XX"
+    );
+
+    await redis.del(updatedBlogKey)
+
     res
         .status(200)
         .json(
             new ApiResponse(
                 200,
-                {
-                    updatedBlog
-                },
+                updatedBlog,
                 "Blog Updated Successfully"
             )
         )
 })
-
-
-export const handlePublishUpdatedBlog = (draftModel, updatedModel) =>
-    asyncHandler(async (req, res) => {
-
-        const { id } = req.params;
-
-        const updatedBlogData = await findDraftBlogAndDeleteId(draftModel, id)
-
-        const updateBlog = await updatedModel.findByIdAndUpdate(
-            updatedBlogData.updatableBlogId,
-            {
-                content: updatedBlogData.content,
-                coverImage: updatedBlogData.coverImage,
-                title: updatedBlogData.title
-            },
-            {
-                new: true
-            }
-        )
-
-        if (!updateBlog) {
-            throw new ApiError(400, "Can not update blog. Try Again")
-        }
-
-        res
-            .status(200)
-            .json(
-                new ApiResponse(
-                    200,
-                    updateBlog,
-                    "Blog Created Successfully"
-                )
-            )
-    })

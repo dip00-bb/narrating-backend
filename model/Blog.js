@@ -44,7 +44,7 @@ const blogSchema = new Schema({
 })
 
 const Blog = model("Blog", blogSchema);
-const Draft=model("Draft",blogSchema)
 
 
-export default {Blog,Draft}
+
+export default Blog
