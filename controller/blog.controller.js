@@ -119,7 +119,6 @@ export const handlePublishBlog = asyncHandler(async (req, res) => {
         )
 })
 
-
 export const handleDeleteDraft = asyncHandler(async (req, res) => {
 
     const { id } = req.params // blog id to delete

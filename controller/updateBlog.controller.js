@@ -2,7 +2,7 @@ import { asyncHandler } from "../ulits/asyncHandler.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
 import redis from "../db/redis.js";
-import { redisKeys, updateExitingString } from "../ulits/redisUtils.js";
+import { parseData, redisKeys, updateExitingString } from "../ulits/redisUtils.js";
 import Blog from "../model/Blog.js";
 
 
@@ -12,9 +12,10 @@ import Blog from "../model/Blog.js";
 export const handleUpdateBlog = asyncHandler(async (req, res) => {
     const { id } = req.params
     const key = redisKeys.updatableBlog(id)
+    console.log(key)
     const updatedContent = req.body
 
-    const stringifiedJson = JSON.stringify({ ...updatedContent, id: id })
+    const stringifiedJson = JSON.stringify({ ...updatedContent, id: id, creatorId: req.user._id })
 
 
     await redis.set(key, stringifiedJson)
@@ -39,15 +40,16 @@ export const handlePublishUpdatedBlog = asyncHandler(async (req, res) => {
     const updatedBlogKey = redisKeys.updatableBlog(id)
 
 
-    const updatedBlogData = await redis.get(updatedBlogKey)
+    const parsedUpdatableBlog = await parseData(updatedBlogKey)
 
-    if (!updatedBlogData) {
+    if (!parsedUpdatableBlog) {
         throw new ApiError(404, "Blog not found")
     }
 
+    if (parsedUpdatableBlog.creatorId !== req.user._id.toString()) {
+        throw new ApiError(403, "Unauthorized ! You can not publish updates")
+    }
 
-
-    const parsedUpdatableBlog = JSON.parse(updatedBlogData)
 
 
     const updatedBlog = await Blog.findByIdAndUpdate(
@@ -75,7 +77,7 @@ export const handlePublishUpdatedBlog = asyncHandler(async (req, res) => {
 
     // also update in cache if it the same blog are saved saved
 
-    await updateExitingString(targetedKey, stringifiedUpdatedBlog,2628000)
+    await updateExitingString(targetedKey, stringifiedUpdatedBlog, 2628000)
 
     await redis.del(updatedBlogKey)
 
@@ -88,4 +90,36 @@ export const handlePublishUpdatedBlog = asyncHandler(async (req, res) => {
                 "Blog Updated Successfully"
             )
         )
+})
+
+
+
+export const handleDeleteUpdatableDraft = asyncHandler(async (req, res) => {
+    const { id } = req.params
+    const deletableUpdatableKey = redisKeys.updatableBlog(id)
+
+
+    const parsedBlogDeletableBlog = await parseData(deletableUpdatableKey)
+
+    if (!parsedBlogDeletableBlog) {
+        throw new ApiError(404, "Blog Not Found")
+    }
+
+    if (parsedBlogDeletableBlog.creatorId !== req.user._id.toString()) {
+        throw new ApiError(403, "Unauthorized ! You can not delete Blog")
+    }
+
+
+    await redis.del(deletableUpdatableKey) // remove the draft from updatable draft
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Drafted Blog Deleted Successfully"
+            )
+        )
+
 })
