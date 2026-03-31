@@ -12,7 +12,7 @@ import Blog from "../model/Blog.js";
 export const handleUpdateBlog = asyncHandler(async (req, res) => {
     const { id } = req.params
     const key = redisKeys.updatableBlog(id)
-    console.log(key)
+
     const updatedContent = req.body
 
     const stringifiedJson = JSON.stringify({ ...updatedContent, id: id, creatorId: req.user._id })
@@ -91,7 +91,6 @@ export const handlePublishUpdatedBlog = asyncHandler(async (req, res) => {
             )
         )
 })
-
 
 
 export const handleDeleteUpdatableDraft = asyncHandler(async (req, res) => {

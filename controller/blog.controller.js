@@ -46,6 +46,8 @@ export const handleCreateDraft = asyncHandler(async (req, res) => {
 
 export const handleUpdateInDraft = asyncHandler(async (req, res) => {
     const { content, coverImage, title } = req.body
+
+
     const { id } = req.params
     const key = redisKeys.draftBlog(id)
 
@@ -130,11 +132,11 @@ export const handleDeleteDraft = asyncHandler(async (req, res) => {
     const parsedBlogDeletableBlog = await parseData(deletableDraftBlogKey)
 
     if (!parsedBlogDeletableBlog) {
-        throw new ApiError("404", "Blog Not Found")
+        throw new ApiError(404, "Blog Not Found")
     }
 
     if (parsedBlogDeletableBlog.creatorId === req.user._id) {
-        throw new ApiError("403", "Unauthorized ! You can not delete Blog")
+        throw new ApiError(403, "Unauthorized ! You can not delete Blog")
     }
 
     const draftList = redisKeys.draftList(req.user._id)
@@ -158,7 +160,36 @@ export const handleDeleteDraft = asyncHandler(async (req, res) => {
 
 })
 
+export const handleLoadPreviousChanges= asyncHandler(async (req, res) => {
+    const { id } = req.params // blog id to update
+    const updatableDraftBlogKey = redisKeys.draftBlog(id) // drafted blog
 
+
+    const parsedUpdatableBlog = await parseData(updatableDraftBlogKey)
+
+    if (!parsedUpdatableBlog) {
+        throw new ApiError(404, "Blog Not Found")
+    }
+
+    if (parsedUpdatableBlog.creatorId === req.user._id) {
+        throw new ApiError(403, "Unauthorized ! You can not delete Blog")
+    }
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    "title": parsedUpdatableBlog.title,
+                    "coverImage": parsedUpdatableBlog.coverImage,
+                    "content": parsedUpdatableBlog.content
+                },
+                ""
+            )
+        )
+
+})
 
 
 

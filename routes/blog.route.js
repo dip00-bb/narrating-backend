@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { handleCreateDraft, handleDeleteBlog, handleDeleteDraft, handleDislikeBlog, handleLikeBlog, handlePublishBlog, handleUpdateInDraft } from "../controller/blog.controller.js";
+import { handleCreateDraft, handleDeleteBlog, handleDeleteDraft, handleDislikeBlog, handleLikeBlog, handleLoadPreviousChanges, handlePublishBlog, handleUpdateInDraft } from "../controller/blog.controller.js";
 import { verifyUser } from "../middlewares/auth.middleware.js";
 import { validator } from "../middlewares/validationMiddleware.js";
 import { blogSchema } from "../schemas/blogSchema.js";
 const router = Router()
+
+
+router.get('/get-previous-changes/:id',verifyUser(),handleLoadPreviousChanges)
 
 router.post('/create-draft-blog', verifyUser(), validator(blogSchema), handleCreateDraft)
 
@@ -12,6 +15,21 @@ router.patch('/update-draft/:id', verifyUser(), validator(blogSchema), handleUpd
 router.post('/publish-blog/:id', verifyUser(), handlePublishBlog)
 
 router.delete('/delete-draft/:id', verifyUser(), handleDeleteDraft)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.post('/like-blog/:id', handleLikeBlog)
 
