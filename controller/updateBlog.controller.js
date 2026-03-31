@@ -2,7 +2,7 @@ import { asyncHandler } from "../ulits/asyncHandler.js";
 import { ApiError } from "../ulits/ApiError.js";
 import { ApiResponse } from "../ulits/ApiResponse.js";
 import redis from "../db/redis.js";
-import { redisKeys } from "../ulits/redisKeyGenerator.js";
+import { redisKeys, updateExitingString } from "../ulits/redisUtils.js";
 import Blog from "../model/Blog.js";
 
 
@@ -74,13 +74,8 @@ export const handlePublishUpdatedBlog = asyncHandler(async (req, res) => {
     const stringifiedUpdatedBlog = JSON.stringify(updatedBlog)
 
     // also update in cache if it the same blog are saved saved
-    await redis.set(
-        targetedKey,
-        stringifiedUpdatedBlog,
-        "EX",
-        2628000,
-        "XX"
-    );
+
+    await updateExitingString(targetedKey, stringifiedUpdatedBlog,2628000)
 
     await redis.del(updatedBlogKey)
 

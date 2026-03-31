@@ -2,7 +2,7 @@
 import redis from "../../db/redis.js"
 import Blog from "../../model/Blog.js"
 import Model from "../../model/Blog.js"
-import { redisKeys } from "../../ulits/redisKeyGenerator.js"
+import { redisKeys } from "../../ulits/redisUtils.js"
 import { notFoundError } from "../custom_error/gqlCustomError.js"
 
 export const blogResolver = {

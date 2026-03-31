@@ -37,7 +37,8 @@ const blogSchema = new Schema({
     status:{
         type: String,
         required:true,
-        enum:['approved','suspended','editing']
+        enum:['approved','suspended','editing'],
+        default:'approved'
     }
 },{
     timestamps:true

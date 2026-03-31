@@ -1,6 +1,6 @@
 import { checkDocumentExist } from "../../ulits/customRestError.js";
 import { editorAndAuthorNotSame, notFoundError } from "../custom_error/gqlCustomError.js";
-import { redisKeys } from "../../ulits/redisKeyGenerator.js";
+import { redisKeys } from "../../ulits/redisUtils.js";
 import redis from "../../db/redis.js";
 import { ApiError } from "../../ulits/ApiError.js";
 import Blog from "../../model/Blog.js";
