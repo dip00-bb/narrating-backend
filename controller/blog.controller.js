@@ -5,7 +5,7 @@ import { ApiResponse } from "../ulits/ApiResponse.js"
 import { asyncHandler } from "../ulits/asyncHandler.js"
 import { checkDocumentExist, editorAndAuthorNotSame } from "../ulits/customRestError.js";
 import { v4 as uuidv4 } from 'uuid';
-import { redisKeys, updateExitingString } from "../ulits/redisUtils.js";
+import { parseData, redisKeys, updateExitingString } from "../ulits/redisUtils.js";
 import Blog from "../model/Blog.js";
 
 
@@ -24,9 +24,8 @@ export const handleCreateDraft = asyncHandler(async (req, res) => {
         content: content,
         coverImage: coverImage,
         title: title,
+        creatorId: req.user._id
     }
-
-
 
     const stringifiedUpcomingData = JSON.stringify(upcomingDataInObject)
     await redis.set(key, stringifiedUpcomingData)
@@ -53,7 +52,8 @@ export const handleUpdateInDraft = asyncHandler(async (req, res) => {
     const updatedDataInObject = {
         content: content,
         coverImage: coverImage,
-        title: title
+        title: title,
+        creatorId: req.user._id
     }
 
     const stringifiedUpdatedData = JSON.stringify(updatedDataInObject)
@@ -85,7 +85,9 @@ export const handlePublishBlog = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Blog No Found")
     }
     const parsedUpdatedBlog = JSON.parse(updatedBlog)
-    console.log(parsedUpdatedBlog)
+
+
+
     const blog = await Blog.create(
         {
             creatorId: req.user._id,
@@ -103,8 +105,6 @@ export const handlePublishBlog = asyncHandler(async (req, res) => {
 
     const publishedBlogPosition = await redis.lpos(draftList, id)
 
-    console.log(publishedBlogPosition)
-
     await redis.lrem(draftList, publishedBlogPosition, key)
     await redis.del(key)
 
@@ -120,11 +120,44 @@ export const handlePublishBlog = asyncHandler(async (req, res) => {
 })
 
 
+export const handleDeleteDraft = asyncHandler(async (req, res) => {
+
+    const { id } = req.params // blog id to delete
+    const deletableDraftBlogKey = redisKeys.draftBlog(id) // drafted blog
 
 
 
 
+    const parsedBlogDeletableBlog = await parseData(deletableDraftBlogKey)
 
+    if (!parsedBlogDeletableBlog) {
+        throw new ApiError("404", "Blog Not Found")
+    }
+
+    if (parsedBlogDeletableBlog.creatorId === req.user._id) {
+        throw new ApiError("403", "Unauthorized ! You can not delete Blog")
+    }
+
+    const draftList = redisKeys.draftList(req.user._id)
+    const deletableBlogPosition = await redis.lpos(draftList, id) // find the deletable blog position
+
+
+
+    await redis.lrem(draftList, deletableBlogPosition, deletableDraftBlogKey) // remove it from list
+
+    await redis.del(deletableDraftBlogKey) // remove the draft also
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Drafted Blog Deleted Successfully"
+            )
+        )
+
+})
 
 
 
