@@ -12,7 +12,7 @@ app.use(cors({
 
 
 app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
 app.use(cookieParser())
 
@@ -21,14 +21,15 @@ import cloudSignature from './routes/signedUpload.router.js'
 import blogRouter from './routes/blog.route.js'
 import commentRouter from './routes/comment.route.js'
 import updateBlogRouter from './routes/updateBlog.route.js'
+import reportRoute from './routes/report.route.js'
 import { createApolloServer } from './graphql/index.js'
 
 app.use('/api/auth/', authRouter)
-app.use('/api/cloudinary',cloudSignature)
-app.use('/api/blog',blogRouter)
-app.use('/api/update',updateBlogRouter)
-app.use('/api/comment',commentRouter)
-
+app.use('/api/cloudinary', cloudSignature)
+app.use('/api/blog', blogRouter)
+app.use('/api/update', updateBlogRouter)
+app.use('/api/comment', commentRouter)
+app.use('/api/report', reportRoute)
 await createApolloServer(app)
 
 app.use(errorHandler)
